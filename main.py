@@ -1,5 +1,6 @@
 import tkinter as tk
 from datetime import datetime
+import requests
 
 #set up the main window 
 root = tk.Tk()
@@ -36,6 +37,26 @@ def update_clock():
 
 
     root.after(1000, update_clock)  
+
+
+#------------------------- update weather with openmeteo API -------------------------#
+def update_weather():
+    #fetch the weather for leicester - Lat: 52.63, Lon: -1.13
+    url = "https://api.open-meteo.com/v1/forecast?latitude=52.63&longitude=-1.13&current=temperature_2m"
+
+    try:
+        response = requests.get(url)
+        data = response.json()
+
+        current_temp = data['current']['temperature_2m']
+
+
+        label_weather.config(text=f"Leicester\n{current_temp}°C")
+    except Exception as e:
+        label_weather.config(text="Weather Info\nError fetching data")
+        print(f"Error fetching weather data: {e}")
+
+    root.after(60000, update_weather)  #update every 60 seconds
 
 #------------------------------------ Testing/Production Code ------------------------------------#
 
