@@ -75,7 +75,8 @@ label_calendar.pack(expand=True)
 
 
 
-update_clock()  #initial call to start the clock update loop
+update_clock()
+update_weather()  #initial call to start the clock update loop
 # keep it running
 root.mainloop()
 
