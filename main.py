@@ -1,6 +1,7 @@
 import tkinter as tk
 from datetime import datetime
 import requests
+import psutil
 
 #set up the main window 
 root = tk.Tk()
@@ -117,13 +118,68 @@ def update_weather():
 
     root.after(300000, update_weather)  #update every 5 mins
 
+
+
+# ------------------ system info function and updating ------------------ #
+def update_system_info():
+    try:
+        #CPU usage percentage
+        cpu_usage = psutil.cpu_percent(interval=1)
+
+        #CPU temperature
+        cpu_temp_string = "N/A" #fallback for errors
+        try:
+            temps = psutil.sensors_temperatures()
+            if 'cpu_thermal' in temps:
+                cpu_temp = temps['cpu_thermal'][0].current #ususal RPI sensor
+                cpu_temp_string = f"{round(temps['cpu_thermal'][0].current)}°C"
+            elif 'coretemp' in temps:
+                cpu_temp = temps['coretemp'][0].current #for any other linux systems 
+                cpu_temp_string = f"{round(temps['coretemp'][0].current)}°C"
+        except Exception as e:
+            pass  #ignore errors in fetching temperature, fallback to N/A
+
+        #RAM usage percentage
+        mem = psutil.virtual_memory()
+        #convert into MB
+        mem_total_mb = mem.total / (1024 * 1024)
+        mem_used_mb = mem.used / (1024 * 1024)
+
+        #storage usage percentage
+        disk = psutil.disk_usage('/')
+        disk_total_gb = disk.total / (1024 * 1024 * 1024)
+        disk_used_gb = disk.used / (1024 * 1024 * 1024)
+
+
+
+        system_text = (
+            f"CPU: {cpu_usage}% [{cpu_temp_string}]\n"
+            f"RAM: {int(mem_used_mb)}/{int(mem_total_mb)}\n"
+            f"{mem.percent}%\n"
+            f"Disk: {disk_used_gb:.1f}/{disk_total_gb:.1f} GB\n"
+        )
+
+        label_sys.config(text=system_text, justify="center")
+    except Exception as e:
+        label_sys.config(text="Error fetching system info", justify="center")
+        print(f"System info error: {e}")
+
+    root.after(2000, update_system_info)  #update every 2 seconds
+
+
+
+
 #------------------------------------ Testing/Production Code ------------------------------------#
 
 #placeholder label for time frame
 label_time = tk.Label(frame_time, text="Time and Date", fg="white", bg="#202124", font=("Consolas", 24))
 label_time.pack(expand=True)
 
-label_sys = tk.Label(frame_sys, text="System Info", fg="white", bg="#202124", font=("Consolas", 24))
+
+
+
+#system information labels and info
+label_sys = tk.Label(frame_sys, text="System Info", fg="white", bg="#202124", font=("Consolas", 18))
 label_sys.pack(expand=True)
 
 # Bottom left Weather frames
@@ -187,6 +243,7 @@ label_calendar.pack(expand=True)
 
 update_clock()
 update_weather() 
+update_system_info()
 # keep it running
 root.mainloop()
 
