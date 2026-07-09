@@ -1,4 +1,3 @@
-import code
 import tkinter as tk
 from datetime import datetime
 import requests
@@ -100,8 +99,15 @@ def update_weather():
         label_weather_icon.config(text=emoji)
         label_weather_condition.config(text=condition)
 
-        forecast_string = f"{time1}   |   {time2}   |   {time3}\n{icon1} {hr1}°C   |   {icon2} {hr2}°C   |   {icon3} {hr3}°C"
-        label_weather_forecast.config(text=forecast_string)
+
+        label_time1.config(text=time1, justify="center")
+        label_temp1.config(text=f"{hr1}°C\n{icon1}")
+
+        label_time2.config(text=time2, justify="center")
+        label_temp2.config(text=f"{hr2}°C\n{icon2}")
+
+        label_time3.config(text=time3, justify="center")
+        label_temp3.config(text=f"{hr3}°C\n{icon3}")
 
     except Exception as e:
         label_weather_temp.config(text="Error")
@@ -114,36 +120,67 @@ def update_weather():
 #------------------------------------ Testing/Production Code ------------------------------------#
 
 #placeholder label for time frame
-label_time = tk.Label(frame_time, text="Time and Date", fg="white", bg="black", font=("Helvetica", 24))
+label_time = tk.Label(frame_time, text="Time and Date", fg="white", bg="#202124", font=("Consolas", 24))
 label_time.pack(expand=True)
 
-
-label_sys = tk.Label(frame_sys, text="System Info", fg="white", bg="blue", font=("Helvetica", 24))
+label_sys = tk.Label(frame_sys, text="System Info", fg="white", bg="#202124", font=("Consolas", 24))
 label_sys.pack(expand=True)
 
-
-
 # Bottom left Weather frames
-label_weather_location = tk.Label(frame_weather, text="Leicester, UK", fg="#9aa0a6", bg="#202124", font=("Helvetica", 14))
+label_weather_location = tk.Label(frame_weather, text="Leicester, UK", fg="#9aa0a6", bg="#202124", font=("Consolas", 14))
 label_weather_location.pack(pady=(20,0))
 
-label_weather_temp = tk.Label(frame_weather, text="Temperature", fg="white", bg="#202124", font=("Helvetica", 56, "bold"))
+label_weather_temp = tk.Label(frame_weather, text="Temperature", fg="white", bg="#202124", font=("Consolas", 56, "bold"))
 label_weather_temp.pack()
 
-label_weather_icon = tk.Label(frame_weather, text="--", fg="white", bg="#202124", font=("Helvetica", 64))
-label_weather_icon.pack(pady=(5, 0))
+label_weather_icon = tk.Label(frame_weather, text="--", fg="white", bg="#202124", font=("Consolas", 64))
+label_weather_icon.pack(pady=(5, 0), padx=(100,0), anchor="center")
 
-label_weather_condition = tk.Label(frame_weather, text="Condition", fg="white", bg="#202124", font=("Helvetica", 24))
+label_weather_condition = tk.Label(frame_weather, text="Condition", fg="white", bg="#202124", font=("Consolas", 24))
 label_weather_condition.pack()
 
-label_weather_forecast = tk.Label(frame_weather, text="Forecast", fg="white", bg="#202124", font=("Helvetica", 14))
+
+
+
+
+#forecast grid sub frame 
+forecast_frame = tk.Frame(frame_weather, bg="#202124")
+forecast_frame.pack(pady=(20, 0))
+
+#column 01 hour 1 forecast
+label_time1 = tk.Label(forecast_frame, text="00:00", fg="#9aa0a6", bg="#202124", font=("Consolas", 16))
+label_time1.grid(row=0, column=0, sticky="ew")
+label_temp1 = tk.Label(forecast_frame, text="--°C", fg="#9aa0a6", bg="#202124", font=("Consolas", 16))
+label_temp1.grid(row=1, column=0, sticky="ew")
+
+# Column 1: Separator Line
+sep1 = tk.Label(forecast_frame, text="  |  ", fg="#9aa0a6", bg="#202124", font=("Consolas", 16))
+sep1.grid(row=0, column=1, rowspan=2, padx=5)
+
+# Column 2: Second Hour
+label_time2 = tk.Label(forecast_frame, text="00:00", fg="#9aa0a6", bg="#202124", font=("Consolas", 16))
+label_time2.grid(row=0, column=2, sticky="ew")
+label_temp2 = tk.Label(forecast_frame, text="--°C", fg="#9aa0a6", bg="#202124", font=("Consolas", 16))
+label_temp2.grid(row=1, column=2, sticky="ew")
+
+# Column 3: Separator Line
+sep2 = tk.Label(forecast_frame, text="  |  ", fg="#9aa0a6", bg="#202124", font=("Consolas", 16))
+sep2.grid(row=0, column=3, rowspan=2, padx=5)
+
+# Column 4: Third Hour
+label_time3 = tk.Label(forecast_frame, text="00:00", fg="#9aa0a6", bg="#202124", font=("Consolas", 16))
+label_time3.grid(row=0, column=4, sticky="ew")
+label_temp3 = tk.Label(forecast_frame, text="--°C", fg="#9aa0a6", bg="#202124", font=("Consolas", 16))
+label_temp3.grid(row=1, column=4, sticky="ew")
+
+label_weather_forecast = tk.Label(frame_weather, text="Forecast", fg="white", bg="#202124", font=("Consolas", 14))
 label_weather_forecast.pack(pady=(20,0))
 
 
 
 
 
-label_calendar = tk.Label(frame_calendar, text="Calendar", fg="white", bg="yellow", font=("Helvetica", 24))
+label_calendar = tk.Label(frame_calendar, text="Calendar", fg="white", bg="#202124", font=("Consolas", 24))
 label_calendar.pack(expand=True)
 
 
