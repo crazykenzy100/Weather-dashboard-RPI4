@@ -42,16 +42,28 @@ def update_clock():
 #------------------------- update weather with openmeteo API -------------------------#
 def update_weather():
     #fetch the weather for leicester - Lat: 52.63, Lon: -1.13
-    url = "https://api.open-meteo.com/v1/forecast?latitude=52.63&longitude=-1.13&current=temperature_2m"
+    url = "https://api.open-meteo.com/v1/forecast?latitude=52.63&longitude=-1.13&current=temperature_2m&hourly=temperature_2m&forecast_days=2"
 
     try:
         response = requests.get(url)
         data = response.json()
 
+        #find the current temp
         current_temp = data['current']['temperature_2m']
 
+        #find the current hour of the day 
+        current_hour = datetime.now().hour
 
-        label_weather.config(text=f"Leicester\n{current_temp}°C")
+        #get the next 3 hours of temperature data
+        hr1 = data['hourly']['temperature_2m'][current_hour + 1]
+        hr2 = data['hourly']['temperature_2m'][current_hour + 2]
+        hr3 = data['hourly']['temperature_2m'][current_hour + 3]
+
+        display_text = f"Leicester\n{current_temp}°C\nNext 3 hours:\n{hr1}°C, {hr2}°C, {hr3}°C"
+
+
+
+        label_weather.config(text=display_text)
     except Exception as e:
         label_weather.config(text="Weather Info\nError fetching data")
         print(f"Error fetching weather data: {e}")
