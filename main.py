@@ -45,22 +45,22 @@ def update_clock():
 #function to get weather condition such as sunny/cloudy/rainy/snowy etc
 def get_weather_condition(code):
     if code == 0:
-        return "Clear"
+        return "Clear", "☀️"
     elif code in [1, 2, 3]:
-        return "Cloudy"
+        return "Cloudy", "☁️"
     elif code in [45, 48]:
-        return "Foggy"
+        return "Foggy", "🌫️"
     elif code in [51, 53, 55, 61, 63, 65]:
-        return "Rainy"
+        return "Rainy", "🌧️"
     elif code in [71, 73, 75]:
-        return "Snowy"
+        return "Snowy", "❄️"
     elif code in [95, 96, 99]:
-        return "Thunderstorm"
-    return "Varying"
+        return "Thunderstorm", "⛈️"
+    return "Varying", "🌤️"
 
 def update_weather():
     #fetch the weather for leicester - Lat: 52.63, Lon: -1.13
-    url = "https://api.open-meteo.com/v1/forecast?latitude=52.63&longitude=-1.13&current=temperature_2m,weather_code&hourly=temperature_2m&forecast_days=2"
+    url = "https://api.open-meteo.com/v1/forecast?latitude=52.63&longitude=-1.13&current=temperature_2m,weather_code&hourly=temperature_2m,weather_code&forecast_days=2"
 
     try:
         response = requests.get(url)
@@ -74,22 +74,40 @@ def update_weather():
 
         #current weather condition code
         weather_code = data['current']['weather_code']
-        condition = get_weather_condition(weather_code)
+        condition, emoji = get_weather_condition(weather_code)
 
         #get the next 3 hours of temperature data
-        hr1 = data['hourly']['temperature_2m'][current_hour + 1]
-        hr2 = data['hourly']['temperature_2m'][current_hour + 2]
-        hr3 = data['hourly']['temperature_2m'][current_hour + 3]
+        hr1 = round(data['hourly']['temperature_2m'][current_hour + 1])
+        hr2 = round(data['hourly']['temperature_2m'][current_hour + 2])
+        hr3 = round(data['hourly']['temperature_2m'][current_hour + 3])
+
+        code1 = data['hourly']['weather_code'][current_hour + 1]
+        code2 = data['hourly']['weather_code'][current_hour + 2]
+        code3 = data['hourly']['weather_code'][current_hour + 3]
+
+        text1, icon1 = get_weather_condition(code1)
+        text2, icon2 = get_weather_condition(code2)
+        text3, icon3 = get_weather_condition(code3)
+
+
+        #find the clock times for the forecasted hours
+        time1 = f"{(current_hour + 1) % 24:02d}:00"
+        time2 = f"{(current_hour + 2) % 24:02d}:00"
+        time3 = f"{(current_hour + 3) % 24:02d}:00"
 
         #styling for the display text
         label_weather_temp.config(text=f"{round(current_temp)}°C")
+        label_weather_icon.config(text=emoji)
         label_weather_condition.config(text=condition)
-        label_weather_forecast.config(text=f"+1h: {hr1}°C   |   +2h: {hr2}°C   |   +3h: {hr3}°C")
+
+        forecast_string = f"{time1}   |   {time2}   |   {time3}\n{icon1} {hr1}°C   |   {icon2} {hr2}°C   |   {icon3} {hr3}°C"
+        label_weather_forecast.config(text=forecast_string)
 
     except Exception as e:
         label_weather_temp.config(text="Error")
         label_weather_condition.config(text="Error")
-        label_weather_forecast.config(text="Error fetching weather data")
+        label_weather_forecast.config(text="Error fetching data")
+        print(f"Weather error: {e}")
 
     root.after(300000, update_weather)  #update every 5 mins
 
@@ -98,6 +116,7 @@ def update_weather():
 #placeholder label for time frame
 label_time = tk.Label(frame_time, text="Time and Date", fg="white", bg="black", font=("Helvetica", 24))
 label_time.pack(expand=True)
+
 
 label_sys = tk.Label(frame_sys, text="System Info", fg="white", bg="blue", font=("Helvetica", 24))
 label_sys.pack(expand=True)
@@ -111,11 +130,15 @@ label_weather_location.pack(pady=(20,0))
 label_weather_temp = tk.Label(frame_weather, text="Temperature", fg="white", bg="#202124", font=("Helvetica", 56, "bold"))
 label_weather_temp.pack()
 
+label_weather_icon = tk.Label(frame_weather, text="--", fg="white", bg="#202124", font=("Helvetica", 64))
+label_weather_icon.pack(pady=(5, 0))
+
 label_weather_condition = tk.Label(frame_weather, text="Condition", fg="white", bg="#202124", font=("Helvetica", 24))
 label_weather_condition.pack()
 
 label_weather_forecast = tk.Label(frame_weather, text="Forecast", fg="white", bg="#202124", font=("Helvetica", 14))
 label_weather_forecast.pack(pady=(20,0))
+
 
 
 
@@ -126,7 +149,7 @@ label_calendar.pack(expand=True)
 
 
 update_clock()
-update_weather()  #initial call to start the clock update loop
+update_weather() 
 # keep it running
 root.mainloop()
 
