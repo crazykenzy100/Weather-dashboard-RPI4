@@ -2,6 +2,7 @@ import tkinter as tk
 from datetime import datetime
 import requests
 import psutil
+import calendar
 
 #set up the main window 
 root = tk.Tk()
@@ -124,7 +125,7 @@ def update_weather():
 def update_system_info():
     try:
         #CPU usage percentage
-        cpu_usage = psutil.cpu_percent(interval=1)
+        cpu_usage = psutil.cpu_percent(interval=None)
 
         #CPU temperature
         cpu_temp_string = "N/A" #fallback for errors
@@ -164,10 +165,53 @@ def update_system_info():
         label_sys.config(text="Error fetching system info", justify="center")
         print(f"System info error: {e}")
 
-    root.after(2000, update_system_info)  #update every 2 seconds
+    root.after(1000, update_system_info) 
 
 
 
+
+# calendar function
+def create_calendar():
+    #get the current month and year
+    now = datetime.now()
+    year = now.year
+    month = now.month
+    today = now.day
+
+    for i in range(7):
+        frame_calendar.grid_rowconfigure(i, weight=1)
+    
+    #header
+    month_name = calendar.month_name[month]
+    label_header = tk.Label(frame_calendar, text=f"{month_name} {year}", fg="white", bg="#202124", font=("Consolas", 24))
+    label_header.grid(row=0, column=0, columnspan=7, pady=(10, 20))
+
+    #days of the week rows
+    days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    for i, day in enumerate(days):
+        label_day = tk.Label(frame_calendar, text=day, fg="#9aa0a6", bg="#202124", font=("Consolas", 14))
+        label_day.grid(row=1, column=i, padx=5, pady=5)
+
+    #dates grid 
+    cal = calendar.monthcalendar(year, month)
+    for row_idx, week in enumerate(cal):
+        for col_idx, day in enumerate(week):
+            if day != 0:
+                if day == today:
+                    label_date = tk.Label(frame_calendar, text=str(day), fg="black", bg="white", font=("Consolas", 14, "bold"), width=4, height=2)
+                else:
+                    label_date = tk.Label(frame_calendar, text=str(day), fg="white", bg="#202124", font=("Consolas", 14), width=4, height=2)
+                label_date.grid(row=row_idx + 2, column=col_idx, padx=5, pady=5)
+
+
+
+    #create a calendar text for the current month
+    cal = calendar.TextCalendar(calendar.SUNDAY)
+    cal_text = cal.formatmonth(year, month)
+
+
+    return cal_text
+    root.after(60000, create_calendar)  
 
 #------------------------------------ Testing/Production Code ------------------------------------#
 
@@ -236,14 +280,15 @@ label_weather_forecast.pack(pady=(20,0))
 
 
 
-label_calendar = tk.Label(frame_calendar, text="Calendar", fg="white", bg="#202124", font=("Consolas", 24))
-label_calendar.pack(expand=True)
+
 
 
 
 update_clock()
 update_weather() 
 update_system_info()
+create_calendar()
+
 # keep it running
 root.mainloop()
 
